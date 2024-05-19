@@ -1,8 +1,6 @@
 ﻿#include <Windows.h>
 #include <stdio.h>
 #include <ppl.h>
-
-
 using namespace concurrency;
 
 static void lclick(int x, int y)
@@ -20,10 +18,6 @@ static void rclick(int x, int y)
 static void wheel(int w)
 {
     mouse_event(MOUSEEVENTF_WHEEL, 0, 0, w, 0);
-}
-static void click(int N)
-{
-    printf("a");
 }
 int main()
 {
