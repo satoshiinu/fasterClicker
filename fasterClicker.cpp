@@ -1,43 +1,62 @@
 ﻿#include <Windows.h>
 #include <stdio.h>
 #include <ppl.h>
-using namespace concurrency;
+#include <bitset>
+#include <ctime>
 
-static void lclick(int x, int y)
+static void lClick()
 {
-    SetCursorPos(x, y);
     mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
     mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 }
-static void rclick(int x, int y)
+static void rClick()
 {
-    SetCursorPos(x, y);
     mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
     mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+}
+static void lClickAt(int x, int y)
+{
+    SetCursorPos(x, y);
+    lClick();
+}
+static void rClickAt(int x, int y)
+{
+    SetCursorPos(x, y);
+    rClick();
 }
 static void wheel(int w)
 {
     mouse_event(MOUSEEVENTF_WHEEL, 0, 0, w, 0);
 }
+static bool isEnd(time_t startTime, int clickMs) {
+    time_t timeNow = time(NULL);
+    return startTime * 1000 + clickMs <= timeNow * 1000;
+}
 int main()
 {
+    char typeChar;
     int curX;
     int curY;
     int clickcount;
     int clickinterval = 3000;
-    Sleep(100);
-    printf("cursor X?");
-    scanf_s("%X", &curX);
-    Sleep(100);
-    printf("cursor Y?");
-    scanf_s("%X", &curY);
-    Sleep(100);
-    printf("click count?");
-    scanf_s("%X", &clickcount);
-    printf("click after %xms", clickinterval);
+    printf("type? p=positioned f=free\n");
+    scanf_s("%c", &typeChar);
+    if (typeChar == 'p') {
+        printf("position? (xpos ypos)\n");
+        scanf_s("%d %d", &curX, &curY);
+    }
+    printf("click count?\n");
+    scanf_s("%d", &clickcount);
+
+
+    printf("click after %dms\n", clickinterval);
     Sleep(clickinterval);
 
-    parallel_for(0, clickcount, [curX, curY](int num) {lclick(curX, curY);});
+    if (typeChar == 'p')
+        concurrency::parallel_for(0, clickcount, [curX, curY](int num) {lClickAt(curX, curY);});
+    else
+        concurrency::parallel_for(0, clickcount, [](int num) {lClick();});
+
 
     printf("clicked");
 
